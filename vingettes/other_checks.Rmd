@@ -1,0 +1,180 @@
+---
+title: "workflow"
+author: "David Hodgson"
+date: "13/11/2020"
+output: html_document
+---
+
+```{r}
+
+setwd("~/documents/research/covid/hero/serobayes")
+
+```
+
+
+```{r}
+
+save_all_datafit()
+data(datafit) # loads all data-sets for fitting into environment
+load_fit_mcmc_all()   # loads all mcmc fits into environment
+
+save_all_dataplt()
+data(dataplt) # loads all data-sets for plotting figures
+
+```
+
+# Check MCMC
+
+```{r}
+# m1
+# says bad for n eff for a few generated quantities but these are fixed values so their sd is 0.
+
+check_hmc_diagnostics(m1_sero[[1]][[1]]) # fine
+check_hmc_diagnostics(m1_sero[[1]][[2]]) # fine
+check_hmc_diagnostics(m1_sero[[2]][[1]]) # fine
+check_hmc_diagnostics(m1_sero[[2]][[2]]) # fine
+check_hmc_diagnostics(m1_sero[[3]][[1]]) # fine
+check_hmc_diagnostics(m1_sero[[3]][[2]]) # fine
+
+check_hmc_diagnostics(m1_asymp[[1]][[1]]) # fine
+check_hmc_diagnostics(m1_asymp[[1]][[2]]) # fine
+check_hmc_diagnostics(m1_asymp[[2]][[1]]) # fine
+check_hmc_diagnostics(m1_asymp[[2]][[2]]) # fine
+check_hmc_diagnostics(m1_asymp[[3]][[1]]) # fine
+check_hmc_diagnostics(m1_asymp[[3]][[2]]) # fine
+
+check_hmc_diagnostics(m2_start[[1]]) # fine
+check_hmc_diagnostics(m2_start[[2]]) # fine
+check_hmc_diagnostics(m2_start[[3]]) # fine
+check_hmc_diagnostics(m2_start[[4]]) # fine
+
+check_hmc_diagnostics(m2_change[[1]]) # fine
+check_hmc_diagnostics(m2_change[[2]]) # fine
+check_hmc_diagnostics(m2_change[[3]]) # fine
+check_hmc_diagnostics(m2_change[[4]]) # fine
+
+
+data_full_more <- data_full$full %>% rename(IgG_S_unit_log2 = IgG_S_unit,
+                          IgG_N_unit_log2 = IgG_N_unit,
+                          IgG_S_unit_hero_log2 = IgG_S_unit_hero,
+                          IgG_N_unit_hero_log2 = IgG_N_unit_hero,
+                          IgA_Serum_S_unit_log2 = IgA_Serum_S_unit,
+                          IgA_Serum_N_unit_log2 = IgA_Serum_N_unit,
+                          IgA_Oral_S_unit_log2 = IgA_Oral_S_unit,
+                          IgA_Oral_N_unit_log2 = IgA_Oral_N_unit) %>% 
+  mutate(IgG_S_unit = case_when(IgG_S_unit_log2>0~(2^IgG_S_unit_log2), IgG_S_unit_log2 == 0~0),
+         IgG_N_unit = case_when(IgG_N_unit_log2>0~(2^IgG_N_unit_log2), IgG_N_unit_log2 == 0~0),
+         IgG_S_unit_hero = case_when(IgG_S_unit_hero_log2>0~(2^IgG_S_unit_hero_log2), IgG_S_unit_hero_log2 == 0~0), 
+         IgG_N_unit_hero = case_when(IgG_N_unit_hero_log2>0~(2^IgG_N_unit_hero_log2), IgG_N_unit_hero_log2 == 0~0), 
+         IgA_Serum_S_unit = case_when(IgA_Serum_S_unit_log2>0~(2^IgA_Serum_S_unit_log2), IgA_Serum_S_unit_log2 == 0~0), 
+         IgA_Serum_N_unit = case_when(IgA_Serum_N_unit_log2>0~(2^IgA_Serum_N_unit_log2), IgA_Serum_N_unit_log2 == 0~0),
+         IgA_Oral_S_unit = case_when(IgA_Oral_S_unit_log2>0~(2^IgA_Oral_S_unit_log2)*2000, IgA_Oral_S_unit_log2 == 0~0), 
+         IgA_Oral_N_unit = case_when(IgA_Oral_N_unit_log2>0~(2^IgA_Oral_N_unit_log2)*2000, IgA_Oral_N_unit_log2 == 0~0))
+
+
+data_full_more$IgG_S_unit %>% max
+
+raw_data <- read.csv(system.file('extdata', 'HERO_data_clean_21Dec2020.csv', package='serobayes'))
+raw_data$IgG_V1_spike_antibody_units %>% max(na.rm = TRUE)
+raw_data$IgG_V2_spike_antibody_units %>% max(na.rm = TRUE)
+
+write.table(data_full_more, here::here("inst", "extdata", "clean_hero.csv"), sep = ",", row.names = FALSE)
+
+  
+```
+
+# Some interesting stats
+
+```{r}
+
+data_all <- data_full$full %>% filter(sample_no == 1)
+data_complete_r <- data_full$full[!(data_full$full$IgG_S_OD %>% is.na),]
+data_complete <- data_complete_r %>% filter(sample_no == 2)
+data_pos <- data_full$sero_pos %>% filter(sample_no == 1)
+data_symp <- data_pos %>% filter(symp_pos == 0)
+
+(data_pos$loc_coded %>% table)/(data_complete$loc_coded %>% table)
+
+(data_pos$c19zone %>% table)/(data_complete$c19zone %>% table)
+(data_pos$gender %>% table)/(data_complete$gender %>% table)
+data_pos$gender %>% length
+
+data_complete$ethnic %>% table
+
+```
+
+
+```{r}
+
+# number of samples recruited
+length(data_full$full$HERO_ID %>% unique)
+
+# number of samples recruited
+length(data_full$full$IgG_S_OD %>% na.omit)
+sum(data_full$full$IgG_S_OD %>% is.na)
+
+# number seropositive on first bleed
+data_full$full %>% pipeline_exclude_strange_dates %>% filter(sero_pos == 1, sample_no == 1) %>% nrow
+data_full$full %>% pipeline_exclude_strange_dates %>% filter(sero_pos == 1, sample_no == 1, c19_diagnosis_category == "No") %>% nrow
+
+# number who seroconverted
+length(data_full$sero_con$HERO_ID %>% unique)
+
+# number who seroreverted
+length(data_full$sero_revert$HERO_ID %>% unique)
+
+# get dates
+  df_dates <- data.frame(
+    "Symptom Onset" = as.Date(data_full$symp$inf_date, origin = "2020-01-01")[seq(1, 326, 2)],
+    "First bleed" = as.Date(data_full$symp$date_of_sample , origin = "2020-01-01")[seq(1, 326, 2)],
+    "Second bleed" = as.Date(data_full$symp$date_of_sample , origin = "2020-01-01")[seq(2, 326, 2)]
+  ) %>% tidyr::gather(event, value)
+df_dates %>% filter(event == "First.bleed") %>% pull(value) %>% sort
+df_dates %>% filter(event == "Second.bleed") %>% pull(value) %>% sort
+
+ 
+
+```
+
+```{r}
+
+# Seroprevalence overall
+post_sero <- extract(m1_sero[[1]][[1]])
+props <- (datafit_prev$c19zones %>% table %>% as.numeric)/nrow(datafit_prev)
+(post_sero$marginal[,,1]*props) %>% apply(1, sum) %>% mean
+(post_sero$marginal[,,1]*props) %>% apply(1, sum) %>% quantile(c(0.025, 0.975))
+
+(post_sero$marginal[,6,1]) %>% mean
+(post_sero$marginal[,6,1]) %>% quantile(c(0.025, 0.975))
+
+
+post_sero <- extract(m1_sero[[2]][[2]])
+# Mean and ci for OT
+post_sero$marginal[,9,1] %>% mean
+post_sero$marginal[,9,1] %>% quantile(c(0.025, 0.975))
+# Mean and ci for Allied
+post_sero$marginal[,2,1] %>% mean
+post_sero$marginal[,2,1] %>% quantile(c(0.025, 0.975))
+
+post_sero <- extract(m1_sero[[3]][[2]])
+# Mean and ci for OT
+post_sero$marginal[,2,1] %>% mean
+post_sero$marginal[,2,1] %>% quantile(c(0.025, 0.975))
+
+
+# Seroprevalence overall
+post_sero <- extract(m1_asymp[[1]][[1]])
+props <- (datafit_prev$c19zones %>% table %>% as.numeric)/nrow(datafit_prev)
+(post_sero$marginal[,,1]*props) %>% apply(1, sum) %>% mean
+(post_sero$marginal[,,1]*props) %>% apply(1, sum) %>% quantile(c(0.025, 0.975))
+
+
+```
+
+```{r}
+
+post1 <- extract(m2_change[[2]])
+get_mean_ci(post1$marginal_s)
+
+```
+
