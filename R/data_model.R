@@ -81,33 +81,22 @@ get_datafit_seroneg <- function() {
 get_datafit_control <- function() {
   elisa_data_s_raw <- read.csv(system.file("extdata", "Sheffield_ELISA_validation_data_S.csv", package = "serobayes"))
   elisa_data_n_raw <- read.csv(system.file("extdata", "Sheffield_ELISA_validation_data_N.csv", package = "serobayes"))
-  elisa_data_s <- clean_data_OD_val_curve_protein(elisa_data_s_raw, "S")
-  elisa_data_n <- clean_data_OD_val_curve_protein(elisa_data_n_raw, "N")
+  elisa_data_s <- clean_data_od_val_curve_protein(elisa_data_s_raw, "S")
+  elisa_data_n <- clean_data_od_val_curve_protein(elisa_data_n_raw, "N")
   elisa_data <- rbind(elisa_data_s, elisa_data_n)
 }
 
-get_data_ab_kin_time <- function() {
+get_datafit_time <- function(numerise = TRUE) {
   df_ab_long_d <- data_full$symp %>%
-    dplyr::select(IgG_S_unit, IgG_N_unit, IgA_Serum_S_unit, IgA_Serum_N_unit,
-      IgA_Oral_S_unit, IgA_Oral_N_unit, days_since_inf)
-  df_ab_long_d$person_id <- 1:(nrow(df_ab_long_d) / 2) %>%
-    purrr::map(~rep(.x, 2)) %>%
-    unlist
+    dplyr::select(Sample_ID,
+                  IgG_S = IgG_S_unitl2_who,
+                  IgG_N = IgG_N_unitl2_who,
+                  IgA_S_Serum = IgA_Serum_N_unitl2,
+                  IgA_N_Serum = IgA_Serum_S_unitl2,
+                  age_group,  gender, ethnic, symp_pos, date_of_sample, sample_no, days_since_inf) %>%
+      mutate(time = 1, symp_pos = factor(symp_pos, levels = c(0, 1), labels = c("Asymp", "Symp")))
   df_ab_long_d
 }
-
-get_data_ab_kin_time_2 <- function() {
-  df_ab_long_d <- data_full$symp %>%
-    dplyr::select(IgG_S_unit, IgG_N_unit, IgA_Serum_S_unit, IgA_Serum_N_unit,
-      IgA_Oral_S_unit, IgA_Oral_N_unit, days_since_inf)
-  df_ab_long_d$person_id <- 1:(nrow(df_ab_long_d) / 2) %>% purrr::map(~rep(.x, 2)) %>% unlist
-  df_ab_long_d$sample_no <- rep(c(1, 2), nrow(df_ab_long_d) / 2)
-  df_diff <- dplyr::filter(df_ab_long_d, sample_no == 2)[, 1:4] - dplyr::filter(df_ab_long_d, sample_no == 1)[, 1:4]
-  df_info <- df_ab_long_d %>% group_by(person_id) %>% dplyr::summarise(days_since_inf = mean(days_since_inf))
-  df_ab_long_d <- dplyr::bind_cols(df_diff, df_info) %>% dplyr::arrange(days_since_inf)
-  df_ab_long_d
-}
-
 
 clean_data_od_val_curve_protein <- function(elisa_data, protein_str) {
   od <- elisa_data$OD %>% purrr::map_dbl(~substr(.x, 3, nchar(.x)) %>% as.numeric)
@@ -124,12 +113,12 @@ clean_data_od_val_curve_protein <- function(elisa_data, protein_str) {
   spec_ci_upper <- spec_ci_split[seq(3, length(spec_ci_split), 3)] %>%
     purrr::map_dbl(~substr(.x, 1, nchar(.x) - 1) %>% as.numeric)
   df_elisa <- rbind(
-    data.frame(OD = OD,
+    data.frame(od = od,
       Value = sens, CI_lower = sens_ci_lower, CI_upper = sens_ci_upper, Type = "Sensitivity"),
-    data.frame(OD = OD,
+    data.frame(od = od,
       Value = spec, CI_lower = spec_ci_lower, CI_upper = spec_ci_upper, Type = "Specificity"))
   df_elisa$protein <- protein_str
-  df_elisa_trim <- df_elisa[df_elisa$OD > 0, ]
+  df_elisa_trim <- df_elisa[df_elisa$od > 0, ]
   df_elisa_trim
 }
 
@@ -149,8 +138,8 @@ get_datafit_od_val <- function(thres_s, thres_n) {
   t2 <- val_n_data %>% dplyr::filter(Pos_Neg == "Neg") %>% dplyr::mutate(sens_ind = (OD < thres_n))
   val_n_data <- rbind(t1, t2)
   val_data <- rbind(val_s_data, val_n_data)
-  val_data$pos_neg <- factor(val_data$Pos_Neg, levels = c("Pos", "Neg"))
-  val_data$ab_protein <- factor(val_data$aB_protein, levels = c("S", "N"))
+  val_data$Pos_Neg <- factor(val_data$Pos_Neg, levels = c("Pos", "Neg"))
+  val_data$ab_protein <- factor(val_data$ab_protein, levels = c("S", "N"))
   val_data
 }
 

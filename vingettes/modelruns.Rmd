@@ -70,9 +70,11 @@ spec <- test_metric("Specificity", 60:100, datafit_seroneg, `<`)
 fit(sens)
 fit(spec)
 
-plot(sens)
-plot(spec)
+plot(sens, 10, 10, "fig3_sens")
+plot(spec, 10, 10, "fig3_spec")
+
 ```
+
 
 # Supplementary figures
 
@@ -80,5 +82,9 @@ plot(spec)
 
 plot_dates()
 plot_correlations()
+plot_time_supp(10, 10)
 
+plot_od_sens_curve(10, 10)
+plot_roc(10, 10)
+plot_roc_age(10, 10)
 ```

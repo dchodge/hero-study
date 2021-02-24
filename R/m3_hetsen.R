@@ -59,9 +59,9 @@ fit.test_metric <- function(obj) {
 }
 
 #' @export
-plot <- function(obj) UseMethod("plot", obj)
+plot <- function(obj, width, height, file_name) UseMethod("plot", obj)
 #' @export
-plot.test_metric <- function(obj) {
+plot.test_metric <- function(obj, width, height, file_name) {
   if (!exists(obj$fit_name)) {
     exec("data",  paste0("fit_mcmc_", obj$short_name))
   }
@@ -93,4 +93,5 @@ plot.test_metric <- function(obj) {
          y =  paste0("Implied ", obj$name),
          color = "Age group (yrs)")
   ggpubr::ggarrange(p1, p2, nrow = 2)
+  ggsave(filename = here::here("outputs", "figs", paste0(file_name, ".pdf")), width = width, height = height)
 }
