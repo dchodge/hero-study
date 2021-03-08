@@ -76,7 +76,7 @@ plot(spec, 10, 10, "fig3_spec")
 ```
 
 
-# Supplementary figures
+# Plot supplementary figures
 
 ```{r Supp}
 
@@ -87,4 +87,5 @@ plot_time_supp(10, 10)
 plot_od_sens_curve(10, 10)
 plot_roc(10, 10)
 plot_roc_age(10, 10)
+
 ```
