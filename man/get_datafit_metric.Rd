@@ -4,7 +4,7 @@
 \alias{get_datafit_metric}
 \title{function to clean the data in object}
 \usage{
-get_datafit_metric(Obj)
+get_datafit_metric(obj)
 }
 \description{
 function to clean the data in object

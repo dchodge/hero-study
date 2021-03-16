@@ -21,7 +21,7 @@ data {
 transformed data{
   vector[n] Time_t; 
 
-  Time_t = Time/30.0;
+  Time_t = Time/28.0;
 }
 parameters {
   vector[num_age] x_a;

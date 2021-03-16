@@ -5,8 +5,10 @@ date: "11/02/2021"
 output: html_document
 ---
 
+# Statistic models in paper
+## Model A. Seroprevalence model
 
-# Model A. Seroprevalence model
+Code to run the seroprevalence model. 
 
 ```{r model A}
 
@@ -19,13 +21,15 @@ fit(asymp)
 clean_samples(prev)
 clean_samples(asymp)
 
-plot(prev, x_axis_str = "Seroprevalence", "Fig1", 8, 6)
-plot(asymp, x_axis_str = "Proportion Asymptomatic", "FigS1",  8, 6)
+plot(prev, "Seroprevalence", "Fig1")
+plot(asymp, "Proportion Asymptomatic", "FigS1")
 
 
 ```
 
-# Model B. AB kinetics model
+## Model B. AB kinetics model
+
+Code to run the antibody kinetics model. 
 
 ```{r model B}
 
@@ -35,11 +39,13 @@ slope_change <- c("marginal_a_s", "marginal_e_s", "marginal_g_s", "marginal_s_s"
 start <- init_model_ab_kin(name = "start",
                            stan_file = "start",
                            datafit = datafit_start,
-                           marginal_vars = inter_start)
+                           marginal_vars = inter_start,
+                           y_axis = "log(AU) at first bleed")
 change <- init_model_ab_kin(name = "change",
                             stan_file = "change",
                             datafit = datafit_change,
-                            marginal_vars = slope_change)
+                            marginal_vars = slope_change,
+                            y_axis = "Change in log(AU) after 28 days")
 
 # Run the mcmc sampler on these fits
 fit(start)
@@ -60,7 +66,9 @@ plot_figure_2(start, change, 8, 8)
 
 ```
 
-# Model C. Commercial assay model
+## Model C. Hetergeneous sensitivity and specificity model
+
+Hetergeneous sensitivity and specficity model.
 
 ```{r model C}
 
@@ -76,15 +84,18 @@ plot(spec, 10, 10, "fig3_spec")
 ```
 
 
-# Supplementary figures
+# Plot supplementary figures
 
 ```{r Supp}
-
-plot_dates()
-plot_correlations()
+# Figure S1
+plot_dates(10, 10)
+# Supp to model 2
+plot_correlations(10, 10)
 plot_time_supp(10, 10)
 
+# Supp to model 3
 plot_od_sens_curve(10, 10)
 plot_roc(10, 10)
 plot_roc_age(10, 10)
+
 ```

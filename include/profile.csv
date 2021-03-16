@@ -1,0 +1,3 @@
+name,thread_id,total_time,forward_time,reverse_time,chain_stack,no_chain_stack,autodiff_calls,no_autodiff_calls
+gp_calc,0x104ae9dc0,112.163,67.0144,45.1482,14738220,1873719036,491274,1001
+prior,0x104ae9dc0,3.53077,3.01108,0.519688,8351658,2947644,491274,1
