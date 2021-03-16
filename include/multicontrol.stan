@@ -27,6 +27,7 @@ transformed parameters {
         f = L_K * eta * diag_pre_multiply(alpha, L_Omega)';
     }    
     p = inv_logit(f);
+    
 }
 model {
     profile("prior") { 
