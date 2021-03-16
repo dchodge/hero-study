@@ -1,5 +1,5 @@
-Package: serobayes
-Title: What the Package Does (One Line, Title Case)
+Package: herostudy
+Title: HERO study statistical analysis
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "David",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "david.hodgson@lshtm.ac.uk",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: Performs the data cleaning, analysis, and figure plotting for the Sheffield HERO Study
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
     pick a license
 Encoding: UTF-8

@@ -88,7 +88,7 @@ fit.Prev_model <- function(obj) {
 }
 
 #' @export
-clean_samples <- function(Prev_model) UseMethod("clean_samples", Prev_model)
+clean_samples <- function(obj) UseMethod("clean_samples", obj)
 #' @export
 clean_samples.Prev_model <- function(obj) {
   if (!exists(obj$fit_name)) {
@@ -116,7 +116,7 @@ clean_samples.Prev_model <- function(obj) {
   for (cov in names(obj$covar_labels)) {
     df_post_t <- df_post_raw %>%
       filter(cov == cov) %>%
-      mutate(group = factor(group, levels = seq_len(obj$covar_labels[[cov]]), labels = obj$covar_labels[[cov]]))
+      mutate(group = factor(group, levels = seq_len(length(obj$covar_labels[[cov]])), labels = obj$covar_labels[[cov]]))
     df_post <- rbind(df_post, df_post_t)
     temp <- obj$datafit %>%
       dplyr::group_by_at(cov) %>%
@@ -145,9 +145,9 @@ clean_samples.Prev_model <- function(obj) {
 
 
 #' @export
-plot <- function(Prev_model, x_axis_str, file_name, height, width) UseMethod("plot", Prev_model)
+plot <- function(obj, x_axis_str, file_name, height, width) UseMethod("plot", obj)
 #' @export
-plot.Prev_model <- function(obj, x_axis_str, file_name, height, width) {
+plot.Prev_model <- function(obj, x_axis_str, file_name, height = 11, width = 8) {
   plt_data <- clean_samples(obj)
   plt_data$fit$cov <- factor(plt_data$fit$cov, levels = levels(plt_data$fit$cov),
                              labels = c("Zones", "Job", "Job location", "Gen.",  "Age", "Ethnicity"))

@@ -3,6 +3,9 @@
 #' @import forcats
 #' @import purrr
 #' @import ggplot2
+#' @import cmdstanr
+#' @import patchwork
+#' @import posterior
 #' @importFrom tidybayes add_fitted_draws compose_data spread_draws
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rstan stan_model sampling extract
@@ -73,8 +76,8 @@ pipeline_add_factor <- function(data) {
     job_grouped = factor(job_grouped,
       levels = c("admin",  "allied medical", "domestic", "hca",  "medic",  "nurse",
         "other", "pharmacy", "PT/OT", "Radiographer", NA),
-      labels = c("Admin",  "Allied medical", "Domestic", "Healthcare workers",
-        "Medic",  "Nurse", "Other", "Pharmacist", "Occupational Therapist", "Radiographer")),
+      labels = c("Admin",  "Allied medical", "Domestic", "Healthcare assistants",
+        "Medic",  "Nurse", "Other", "Pharmacist", "Occupational and physiotherapists", "Radiographer")),
     loc_coded = factor(loc_coded,
       levels = c("loc_ed", "loc_amu", "loc_critcare", "loc_elderlycare",
         "loc_infectdis", "loc_other", "loc_resp_gsm", "loc_respiratory", NA),
@@ -91,7 +94,7 @@ pipeline_add_factor <- function(data) {
 # Conversion from UI to WHO-UI
 convert_to_who_ui_s <- function(hero_units) {
   who_units <- vector()
-  for (i in seq_len(hero_units)) {
+  for (i in seq_len(length(hero_units))) {
     if (hero_units[i] == 0)
       who_units[i] <- 0
     else
@@ -102,7 +105,7 @@ convert_to_who_ui_s <- function(hero_units) {
 
 convert_to_who_ui_n <- function(hero_units) {
   who_units <- vector()
-  for (i in seq_len(hero_units)) {
+  for (i in seq_len(length(hero_units))) {
     if (hero_units[i] == 0)
       who_units[i] <- 0
     else
@@ -130,10 +133,10 @@ pipeline_add_logtitre <- function(data) {
         !is.na(IgG_N_unit_hero)~log2(IgG_N_unit_hero)),
           .after = IgG_N_unit_hero) %>%
     mutate(IgG_S_unitl2_who =
-      convert_to_who_ui_S(IgG_S_unitl2_hero),
+      convert_to_who_ui_s(IgG_S_unitl2_hero),
         .after = IgG_S_unitl2_hero) %>%
     mutate(IgG_N_unitl2_who =
-      convert_to_who_ui_N(IgG_N_unitl2_hero),
+      convert_to_who_ui_n(IgG_N_unitl2_hero),
         .after = IgG_N_unitl2_hero) %>%
     mutate(IgA_Serum_N_unitl2 =
       dplyr::case_when(is.na(IgA_Serum_N_unit)~0,
@@ -191,7 +194,7 @@ pipeline_get_sero_pos_either <- function(data) {
   ids <- unique(data$HERO_ID)
   bool_sero_pos <- vector()
   data <- data %>% dplyr::arrange(Sample_ID, date_of_sample)
-  for (i in seq_len(ids)) {
+  for (i in seq_len(length(ids))) {
     bool_sero_pos <- c(bool_sero_pos, rep(all(data[data$HERO_ID == ids[i], ][["sero_pos"]] == c(0, 0)), 2))
   }
   data <- data[!bool_sero_pos, ]
@@ -202,7 +205,7 @@ pipeline_get_sero_revert <- function(data) {
   ids <- unique(data$HERO_ID)
   bool_sero_pos <- vector()
   data <- data %>% dplyr::arrange(Sample_ID, date_of_sample)
-  for (i in seq_len(ids)) {
+  for (i in seq_len(length(ids))) {
     bool_sero_pos <- c(bool_sero_pos, rep(all(data[data$HERO_ID == ids[i], ][["sero_pos"]] == c(1, 0)), 2))
   }
   data <- data[bool_sero_pos, ]
@@ -213,7 +216,7 @@ pipeline_get_sero_con <- function(data) {
   ids <- unique(data$HERO_ID)
   bool_sero_pos <- vector()
   data <- data %>% dplyr::arrange(Sample_ID, date_of_sample)
-  for (i in seq_len(ids)) {
+  for (i in seq_len(length(ids))) {
     bool_sero_pos <- c(bool_sero_pos, rep(all(data[data$HERO_ID == ids[i], ][["sero_pos"]] == c(0, 1)), 2))
   }
   data <- data[bool_sero_pos, ]
@@ -224,7 +227,7 @@ pipeline_exclude_sero_convert <- function(data) {
   ids <- unique(data$HERO_ID)
   bool_sero_pos <- vector()
   data <- data %>% dplyr::arrange(Sample_ID, date_of_sample)
-  for (i in seq_len(ids)) {
+  for (i in seq_len(length(ids))) {
     bool_sero_pos <- c(bool_sero_pos, rep(all(data[data$HERO_ID == ids[i], ][["sero_pos"]] == c(1, 0)), 2))
   }
   data <- data[!bool_sero_pos, ]
@@ -235,7 +238,7 @@ pipeline_get_sero_pos_both <- function(data) {
   ids <- unique(data$HERO_ID)
   bool_sero_pos <- vector()
   data <- data %>% dplyr::arrange(Sample_ID, date_of_sample)
-  for (i in seq_len(ids)) {
+  for (i in seq_len(length(ids))) {
     bool_sero_pos <- c(bool_sero_pos, rep(all(data[data$HERO_ID == ids[i], ][["sero_pos"]] == c(1, 1)), 2))
   }
   data <- data[bool_sero_pos, ]
@@ -244,7 +247,7 @@ pipeline_get_sero_pos_both <- function(data) {
 
 
 output_rdata <- function() {
-  raw_data <- read.csv(system.file("extdata", "HERO_data_clean_21Dec2020.csv", package = "serobayes"))
+  raw_data <- read.csv(system.file("extdata", "HERO_data_clean_21Dec2020.csv", package = "herostudy"))
 
   custom_pivot <- raw_data %>%
     build_longer_spec(

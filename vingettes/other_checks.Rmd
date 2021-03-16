@@ -93,7 +93,7 @@ data_complete <- data_complete_r %>% filter(sample_no == 2)
 data_pos <- data_full$sero_pos %>% filter(sample_no == 1)
 data_symp <- data_pos %>% filter(symp_pos == 0)
 
-(data_pos$loc_coded %>% table)/(data_complete$loc_coded %>% table)
+(data_symp$gender %>% table)/(data_pos$gender %>% table) * 100
 
 (data_pos$c19zone %>% table)/(data_complete$c19zone %>% table)
 (data_pos$gender %>% table)/(data_complete$gender %>% table)
@@ -114,8 +114,15 @@ length(data_full$full$IgG_S_OD %>% na.omit)
 sum(data_full$full$IgG_S_OD %>% is.na)
 
 # number seropositive on first bleed
-data_full$full %>% pipeline_exclude_strange_dates %>% filter(sero_pos == 1, sample_no == 1) %>% nrow
-data_full$full %>% pipeline_exclude_strange_dates %>% filter(sero_pos == 1, sample_no == 1, c19_diagnosis_category == "No") %>% nrow
+data_full$full %>%
+  pipeline_exclude_strange_dates %>%
+  filter(sero_pos == 1, sample_no == 1) %>%
+  nrow
+
+data_full$full %>%
+  pipeline_exclude_strange_dates %>%
+  filter(sero_pos == 1, sample_no == 1, c19_diagnosis_category == "No") %>%
+  nrow
 
 # number who seroconverted
 length(data_full$sero_con$HERO_ID %>% unique)

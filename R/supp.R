@@ -1,14 +1,33 @@
 ## Plot Supplementary Figure 1
 plot_dates <- function(height, width) {
-  df_dates <- data.frame(
-    "Symptom Onset" = as.Date(data_full$symp$inf_date, origin = "2020-01-01")[seq(1, 326, 2)],
-    "First bleed" = as.Date(data_full$symp$date_of_sample, origin = "2020-01-01")[seq(1, 326, 2)],
-    "Second bleed" = as.Date(data_full$symp$date_of_sample, origin = "2020-01-01")[seq(2, 326, 2)]) %>%
-    tidyr::gather(event, value)
-  ggplot(data = df_dates) +
-    geom_histogram(aes(x = value, fill = event), color = "black") +
-    labs(x = "Date (2020)", y = "Count", fill = "Event") + theme_bw()
-  ggsave(filename = here::here("outputs", "figs", "supp_timings.pdf"), height = height, width = width)
+  all_bld1 <- data_full$full %>% filter(sample_no == "1")
+  all_bld2 <- data_full$full %>% filter(sample_no == "2")
+  symp_bld1 <- data_full$symp %>% filter(sample_no == "1")
+  symp_bld2 <- data_full$symp %>% filter(sample_no == "2")
+  event_names <- c("First bleed (all cases)", "Second bleed (all cases)",  "Symptom onset", 
+    "First bleed (symptomatic cases)", "Second bleed (symptomatic cases)")
+  dates_list <- list(
+    as.Date(all_bld1$date_of_sample, origin = "2020-01-01"),
+    as.Date(all_bld2$date_of_sample, origin = "2020-01-01"),
+    as.Date(symp_bld1$inf_date, origin = "2020-01-01"),
+    as.Date(symp_bld1$date_of_sample, origin = "2020-01-01"),
+    as.Date(symp_bld2$date_of_sample, origin = "2020-01-01"))
+  df_dates <- map2(event_names, dates_list, ~data.frame(event = .x, dates = .y)) %>% bind_rows
+  df_dates$event <- factor(df_dates$event, levels = event_names)
+
+  ggplot(data = df_dates, aes(x = dates, fill = event)) +
+    geom_histogram(color = "black", position = "identity", alpha = 0.5) +
+    labs(x = "Date (2020)", y = "Count", fill = "Event") + theme_bw() + 
+    scale_fill_manual(values = c("#008ECC", "#eb6c6c", "#07bc0d", "#1034A6", "#d01c1c")) +
+    theme(legend.position = "right", aspect.ratio = 0.8)
+  ggsave(filename = here::here("outputs", "figs", "supp_timings_A.pdf"), height = height, width = width)
+
+  ggplot(data = df_dates, aes(x = dates, fill = event, y = ..density..)) +
+    geom_histogram(position = "identity", color = "black", alpha = 0.5) +
+    labs(x = "Date (2020)", y = "Density", fill = "Event") + theme_bw() +
+    scale_fill_manual(values = c("#008ECC", "#eb6c6c", "#07bc0d", "#1034A6", "#d01c1c")) + 
+    theme(legend.position = "right", aspect.ratio = 0.8)
+  ggsave(filename = here::here("outputs", "figs", "supp_timings_B.pdf"), height = height, width = width)
 }
 
 
@@ -29,8 +48,7 @@ get_df_correlation_model <- function() {
 
 get_rsquared <- function() {
   data_measure <- get_df_correlation_model()
-  measure_names <- c("IgG-S", "IgG-N", "IgA-serum-S", "IgA-serum-N")
-
+  measure_names <- c("IgG-S", "IgG-N", "IgA-serum-S", "IgA-serum-N")  
   corr_val <- matrix(, 4, 4)
   data_r <- data.frame()
   for (i in 1:4) {
@@ -55,10 +73,12 @@ get_rsquared <- function() {
 plot_correlations <- function(height, width) {
   compare_ab <- get_rsquared()
   measure_names <- c("IgG-S", "IgG-N", "IgA-serum-S", "IgA-serum-N")
+  measures_name_plt <- c("spike-IgG", "NCP-IgG", "spike-IgA", "NCP-IgA")
+
   ggplot(data = compare_ab$data, aes(x = x, y = y)) +
     geom_point(alpha = 0.6, size = 0.1) +
-    facet_grid(rows = vars(factor(measure1, levels = measure_names)),
-      cols = vars(factor(measure2, levels = measure_names))) +
+    facet_grid(rows = vars(factor(measure1, levels = measure_names, labels = measures_name_plt)),
+      cols = vars(factor(measure2, levels = measure_names, labels = measures_name_plt))) +
     geom_label(data = compare_ab$corr, aes(x = 0, y = 2, label = value)) +
     labs(x = "Antibody measure", y = "Antibody measure")
   ggsave(filename = here::here("outputs", "figs", "supp_corr.pdf"), height = height, width = width)
@@ -93,8 +113,10 @@ plot_time_supp <- function(height, width) {
   }
 
   measure_list <- c("IgG_S", "IgG_N", "IgA_S_Serum", "IgA_N_Serum")
+  measures_name_plt <- c("spike-IgG", "NCP-IgG", "spike-IgA", "NCP-IgA")
+
   longdata <- (1:4 %>% map(~ (tidybayes::spread_draws(m4_time[[.x]], a, b) %>%
-      mutate(antibody = measure_list[.x])))) %>%
+    mutate(antibody = measure_list[.x])))) %>%
     bind_rows
   longdatamean <- longdata %>% group_by(antibody) %>% summarise(a = mean(a), b = mean(b))
 
@@ -107,7 +129,7 @@ plot_time_supp <- function(height, width) {
     geom_abline(data = longdatamean,
       aes(intercept = a * 10, slope = b / 10), color = "darkred", size = 2) +
     geom_point(data = data_time_plot, aes(x = days_since_inf, y = antibody_measure), shape = 5, alpha = 0.8) +
-    facet_wrap(vars(factor(antibody, levels = measure_list)), nrow = 2) + theme_bw() + theme(aspect.ratio = 0.7) +
+    facet_wrap(vars(factor(antibody, levels = measure_list, labels = measures_name_plt)), nrow = 2) + theme_bw() + theme(aspect.ratio = 0.7) +
     labs(x = "Days post-symptom onset", y = "Antibody measure (logAU)")
   ggsave(filename = here::here("outputs", "figs", "supp_time_pso.pdf"), height = height, width = width)
 }
@@ -217,9 +239,9 @@ plot_roc_age <- function(height, width) {
     unique %>%
     mutate(FPR = 1 - spec) %>%
     arrange(sens)
-
+ 
   lol <- data.frame()
-  for (i in seq(0, 2, 0.2)) {
+  for (i in seq(0, 2, 0.2)) {c
     lol1 <- datafit_full %>% filter(OD == i)
     lol <- rbind(lol, lol1)
   }
@@ -237,6 +259,7 @@ plot_roc_age <- function(height, width) {
       color = (palette(rainbow(9)) %>% purrr::map(~rep(.x, 10)) %>% unlist),
       size = 2.5, position = position_jitter(width = 0.003, height = 0.001)) +
     xlim(0, 0.2) + ylim(0.25, 1)
+    
   ggsave(filename = here::here("outputs", "figs", "roc_age.pdf"),
     height = height, width = width)
 }

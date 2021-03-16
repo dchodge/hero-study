@@ -43,7 +43,7 @@ transformed parameters{
 }
 model {
   // likelihood
-  ab_measure ~ normal(mu, sigma);
+  ab_measure_t ~ normal(mu, sigma);
   // priors
   
   a ~ normal(0.6, 0.05);

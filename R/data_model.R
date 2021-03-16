@@ -79,8 +79,8 @@ get_datafit_seroneg <- function() {
 }
 
 get_datafit_control <- function() {
-  elisa_data_s_raw <- read.csv(system.file("extdata", "Sheffield_ELISA_validation_data_S.csv", package = "serobayes"))
-  elisa_data_n_raw <- read.csv(system.file("extdata", "Sheffield_ELISA_validation_data_N.csv", package = "serobayes"))
+  elisa_data_s_raw <- read.csv(system.file("extdata", "Sheffield_ELISA_validation_data_S.csv", package = "herostudy"))
+  elisa_data_n_raw <- read.csv(system.file("extdata", "Sheffield_ELISA_validation_data_N.csv", package = "herostudy"))
   elisa_data_s <- clean_data_od_val_curve_protein(elisa_data_s_raw, "S")
   elisa_data_n <- clean_data_od_val_curve_protein(elisa_data_n_raw, "N")
   elisa_data <- rbind(elisa_data_s, elisa_data_n)
@@ -124,14 +124,14 @@ clean_data_od_val_curve_protein <- function(elisa_data, protein_str) {
 
 
 get_datafit_od_val <- function(thres_s, thres_n) {
-  val_s_data <- read.csv(system.file("extdata", "HERO_Validation_OD_21Dec2020_S.csv", package = "serobayes"))
+  val_s_data <- read.csv(system.file("extdata", "HERO_Validation_OD_21Dec2020_S.csv", package = "herostudy"))
   val_s_data$ab_protein <- "S"
   val_s_data$od_thres <- thres_s
   t1 <- val_s_data %>% dplyr::filter(Pos_Neg == "Pos") %>% dplyr::mutate(sens_ind = (OD > thres_s))
   t2 <- val_s_data %>% dplyr::filter(Pos_Neg == "Neg") %>% dplyr::mutate(sens_ind = (OD < thres_s))
   val_s_data <- rbind(t1, t2)
 
-  val_n_data <- read.csv(system.file("extdata", "HERO_Validation_OD_21Dec2020_N.csv", package = "serobayes"))
+  val_n_data <- read.csv(system.file("extdata", "HERO_Validation_OD_21Dec2020_N.csv", package = "herostudy"))
   val_n_data$ab_protein <- "N"
   val_n_data$od_thres <- thres_n
   t1 <- val_n_data %>% dplyr::filter(Pos_Neg == "Pos") %>% dplyr::mutate(sens_ind = (OD > thres_n))
