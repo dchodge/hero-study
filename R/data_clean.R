@@ -82,7 +82,7 @@ pipeline_add_factor <- function(data) {
       levels = c("loc_ed", "loc_amu", "loc_critcare", "loc_elderlycare",
         "loc_infectdis", "loc_other", "loc_resp_gsm", "loc_respiratory", NA),
       labels = c("Emergency Department", "Acute Medical Unit", "Critical Care",
-        "Elderly Care",  "Infectious Disease Ward", "Other", "Respiratory Geriatric Ward", "Respiratory Ward")),
+        "Geriatric Care",  "Infectious Disease Ward", "Other", "Respiratory Geriatric Ward", "Respiratory Ward")),
     c19zones = factor(c19zones, levels = c("I've not worked in any patient areas",
         "I've worked in green zones most days",
         "I've attended/cared for COVID-19 patients but only after they've been declared no longer infectious",
