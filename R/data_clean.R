@@ -3,6 +3,7 @@
 #' @import forcats
 #' @import purrr
 #' @import ggplot2
+#' @import cmdstanr
 #' @import patchwork
 #' @import posterior
 #' @importFrom tidybayes add_fitted_draws compose_data spread_draws
