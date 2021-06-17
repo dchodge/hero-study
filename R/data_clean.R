@@ -6,6 +6,7 @@
 #' @import cmdstanr
 #' @import patchwork
 #' @import posterior
+#' @import ggpubr
 #' @importFrom tidybayes add_fitted_draws compose_data spread_draws
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rstan stan_model sampling extract
