@@ -143,7 +143,6 @@ clean_samples.Prev_model <- function(obj) {
   fig_data
 }
 
-
 #' @export
 plot <- function(obj, x_axis_str, file_name, height, width) UseMethod("plot", obj)
 #' @export
@@ -153,6 +152,23 @@ plot.Prev_model <- function(obj, x_axis_str, file_name, height = 11, width = 8) 
                              labels = c("Zones", "Job", "Job location", "Gen.",  "Age", "Ethnicity"))
   plt_data$data$cov <- factor(plt_data$data$cov, levels = levels(plt_data$data$cov),
                              labels = c("Zones", "Job", "Job location", "Gen.", "Age", "Ethnicity"))
+  
+  plt_data$data <- plt_data$data %>% mutate(cat = case_when(
+    cat == "1" ~ "Lowest COVID-19 contact-1",
+    cat == "6" ~ "Highest COVID-19 contact-6",
+    TRUE ~ as.character(cat)
+  ))
+  vars1 <- plt_data$data %>% pull(cat) %>% unique
+  plt_data$data <- plt_data$data %>% mutate(cat = factor(cat, levels = vars1))
+
+  plt_data$fit <- plt_data$fit %>% mutate(group = case_when(
+    group == "1" ~ "Lowest COVID-19 contact-1",
+    group == "6" ~ "Highest COVID-19 contact-6",
+    TRUE ~ as.character(group)
+  ))
+  vars2 <- plt_data$fit %>% pull(group) %>% unique
+  plt_data$fit <- plt_data$fit %>% mutate(group = factor(group, levels = vars2))
+
   p1 <- ggplot(data = plt_data$fit) +
     geom_point(data = plt_data$data, aes(x = value, y = cat), color = "black", shape = 8, alpha = 1, size = 3) +
     geom_linerange(aes(xmin = `0.025`, xmax = `0.975`, y = group, colour = type),
