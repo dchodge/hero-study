@@ -21,5 +21,6 @@ Imports:
     rstan,
     rstanarm,
     cmdstanr,
-    posterior
+    posterior,
+    ggpubr
 Additional_repositories: https://mc-stan.org/r-packages/
