@@ -245,6 +245,11 @@ pipeline_get_sero_pos_both <- function(data) {
   data
 }
 
+raw_data_dec <- read.csv(system.file("extdata", "HERO_data_clean_21Dec2020.csv", package = "herostudy"))
+raw_data_oct <- read.csv(system.file("extdata", "HERO_data_clean_14Oct2020.csv", package = "herostudy"))
+
+raw_data_oct %>% pull(V1_serostatus) %>% table
+raw_data_dec %>% pull(V1_serostatus) %>% table
 
 output_rdata <- function() {
   raw_data <- read.csv(system.file("extdata", "HERO_data_clean_21Dec2020.csv", package = "herostudy"))

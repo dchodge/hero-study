@@ -112,7 +112,7 @@ plot.test_metric <- function(obj, width, height, file_name) {
     ggdist::geom_lineribbon(aes(x = s, y = p_post * 100, ymin = .lower * 100, ymax = .upper * 100),
       fill = "black", size = 1, alpha = 0.6) +
     facet_grid(rows = vars(pro)) + theme_bw() + theme(aspect.ratio = 0.3) +
-    labs(x = paste0(obj$name, " of control (%)"), y = paste0("Implied ", tolower(obj$name), " of HERO study (%)"), 
+    labs(x = paste0(obj$name, " of assay validation dataset (%)"), y = paste0("Implied ", tolower(obj$name), " of HERO study (%)"), 
       fill = "Age group")
 
   p2 <- ggplot(data = posti_all) +
@@ -120,7 +120,7 @@ plot.test_metric <- function(obj, width, height, file_name) {
     ggdist::geom_lineribbon(aes(x = s, y = p_post * 100, ymin = .lower * 100, ymax = .upper * 100,
       fill = a), size = 1, alpha = 0.6) +
     facet_grid(rows = vars(pro)) + theme_bw() + theme(aspect.ratio = 0.3, legend.position = "top") +
-    labs(x = paste0(obj$name, " of control (%)"), 
+    labs(x = paste0(obj$name, " of assay validation dataset (%)"), 
       y =  paste0("Implied age-specific ", tolower(obj$name), "\n of HERO study (%)"), fill = "Age group")
   p1 / p2 + plot_annotation(tag_levels = 'A')
   ggsave(filename = here::here("outputs", "figs", paste0(file_name, ".pdf")), width = width, height = height)

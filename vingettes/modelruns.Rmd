@@ -33,6 +33,8 @@ Code to run the antibody kinetics model.
 
 ```{r model B}
 
+library(posterior) 
+
 inter_start <- c("marginal_a_i", "marginal_e_i", "marginal_g_i", "marginal_s_i")
 slope_change <- c("marginal_a_s", "marginal_e_s", "marginal_g_s", "marginal_s_s")
 

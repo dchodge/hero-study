@@ -93,6 +93,35 @@ data_complete <- data_complete_r %>% filter(sample_no == 2)
 data_pos <- data_full$sero_pos %>% filter(sample_no == 1)
 data_symp <- data_pos %>% filter(symp_pos == 0)
 
+all <- data_all %>% filter(sample_no == 1)
+allpos <- data_all %>% filter(sample_no == 1, sero_pos == 1)
+allasymp <- data_all %>% filter(sample_no == 1, sero_pos == 1, symp_pos == 0)
+
+(allasymp %>% nrow)
+(allpos %>% nrow)
+
+# loc_coded, job_grouped, c19zones, gender, ethnic, age_group
+values <- all %>% pull(loc_coded) %>% table
+valuespos <- allpos %>% pull(gender) %>% table
+valuesasymp <- allasymp %>% pull(gender) %>% table
+data.frame(number = valuesasymp, prec = valuesasymp / valuespos)
+
+allneg <- data_full$full %>% filter(sample_no == 1, sero_pos == 0)
+allposV1 <- data_full$full %>% filter(sample_no == 2, sero_pos == 1)
+allrevert <- allposV1 %>% filter(Sample_ID %in% allneg$Sample_ID)
+
+valuesneg <- allneg %>% pull(loc_coded) %>% table
+valuesrevert <- allrevert %>% pull(loc_coded) %>% table 
+data.frame(number = valuesrevert, prec = valuesrevert / valuesneg)
+
+
+allsinci %>% nrow
+(allneg %>% nrow)
+
+
+vals <- seq_len(length(valuespos)) %>% map(~allasymp %>% filter(age_group == valuespos[.x]) %>% nrow %>% setNames(valuespos[.x])) %>% unlist
+c(24, 18, 24, 25, 10) / c(51, 60, 61, 67, 25)
+
 (data_symp$gender %>% table)/(data_pos$gender %>% table) * 100
 
 (data_pos$c19zone %>% table)/(data_complete$c19zone %>% table)
