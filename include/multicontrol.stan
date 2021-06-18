@@ -24,7 +24,7 @@ transformed parameters {
     profile("gp_calc") { 
         K = cov_exp_quad(x_gp, 1.0, rho) + diag_matrix(rep_vector(delta, N_gp));
         L_K = cholesky_decompose(K);
-        f = L_K * eta * diag_pre_multiply(alpha, L_Omega)';
+        f = L_K * eta * diag_pre_multiply(alpha, L_Omega);
     }    
     p = inv_logit(f);
     
