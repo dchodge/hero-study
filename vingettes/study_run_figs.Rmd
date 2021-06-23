@@ -21,8 +21,8 @@ fit(asymp)
 clean_samples(prev)
 clean_samples(asymp)
 
-plot(prev, "Seroprevalence", "Fig1")
-plot(asymp, "Proportion Asymptomatic", "FigS1")
+plot(prev, "Seroprevalence", "Fig1") # calls clean_samples(prev)
+plot(asymp, "Proportion Asymptomatic", "FigS1")  # calls clean_samples(asymp)
 
 
 ```
