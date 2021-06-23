@@ -36,13 +36,13 @@ The guts of the code is in the `/R` folder. The scripts are as follows:
 * `R/supp.R` — code to make the supplementary figs
 
 The mcmc samples are in the `/data` folder:
-*`/data/datafit.RData` Is all the data required to fit the mcmc models. This is saved with the `save_all_datafit()` function, and loaded into the environment with the `load_all_datafit()` function.
-*`/data/fit_mcmc_prev.RData` are the raw mcmc samples from the cmdstanr model for the prevalence model shown in the Figure 1.
- *`/data/fit_mcmc_asymp.RData` are the raw mcmc samples from the cmdstanr model for the asymptomatic model shown in the Figure SX. 
-*`/data/fit_mcmc_start.RData` are the raw mcmc samples from the cmdstanr model for the starting titre value model shown in the Figure 2.
- *`/data/fit_mcmc_change.RData` are the raw mcmc samples from the cmdstanr model for the change in titre value model shown in the Figure 2.
-*`/data/fit_mcmc_sens.RData` are the raw mcmc samples from the cmdstanr model for the heterogenous sensitivity model shown in Figure 3.
- *`/data/fit_mcmc_spec.RData` are the raw mcmc samples from the cmdstanr model for the heterogenous specificity model shown in Figure SX.
+* `/data/datafit.RData` Is all the data required to fit the mcmc models. This is saved with the `save_all_datafit()` function, and loaded into the environment with the `load_all_datafit()` function.
+* `/data/fit_mcmc_prev.RData` are the raw mcmc samples from the cmdstanr model for the prevalence model shown in the Figure 1.
+* `/data/fit_mcmc_asymp.RData` are the raw mcmc samples from the cmdstanr model for the asymptomatic model shown in the Figure S6. 
+* `/data/fit_mcmc_start.RData` are the raw mcmc samples from the cmdstanr model for the starting titre value model shown in the Figure 2.
+* `/data/fit_mcmc_change.RData` are the raw mcmc samples from the cmdstanr model for the change in titre value model shown in the Figure 2.
+* `/data/fit_mcmc_sens.RData` are the raw mcmc samples from the cmdstanr model for the heterogenous sensitivity model shown in Figure 3.
+* `/data/fit_mcmc_spec.RData` are the raw mcmc samples from the cmdstanr model for the heterogenous specificity model shown in Figure S11.
 
 The stan code and the raw mcmc outputs is contained in the `outputs/` folder.
 
