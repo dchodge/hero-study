@@ -14,7 +14,7 @@ Clone the repository and use `devtools::load_all()` to load everything into R. T
 
 * Before cloning, make sure you have installed [github lfs](https://git-lfs.github.com/) on your computer.
 * In R, make sure you have installed and loaded [devtools](https://devtools.r-lib.org/).
-* Clone this repository onto your computer (e.g. git clone https://github.com/dchodge/hero-study.git)
+* Clone this repository onto your computer (e.g. `git clone https://github.com/dchodge/hero-study.git`)
 * Load R and make sure your working directory is `/YOUR-PATH/hero-study`
 * Use `devtools::install_dev_deps()` to install all dependency packages automatically (alternatively see the `DESCRIPTION` file for a list of dependencies and their sources). Depending on your operating system several packages may have additional installation requirements (`rstan` and `cmdstanr`). See the installation instructions for these packages for details.
 * Use `cmdstanr::install_cmdstan()` to install the `cmdstan` backened used for model fitting. See the `cmdstanr` documentation for further details.
@@ -33,7 +33,7 @@ The guts of the code is in the `/R` folder. The scripts are as follows:
 * `/R/m1_prev.R` — All the code needed to run, process the posterior distributions, and plot the figures for the prevalence model
 * `/R/m2_abkin.R` — All the code needed to run, process the posterior distributions, and plot the figures for the antibody kinetics model
 * `/R/m3_hetsen.R` — All the code needed to run, process the posterior distributions, and plot the figures for the hetergeneous sensitivity and specificity model
-* R/supp.R` — code to make the supplementary figs
+* `R/supp.R` — code to make the supplementary figs
 
 The mcmc samples are in the `/data` folder:
 *`/data/datafit.RData` Is all the data required to fit the mcmc models. This is saved with the `save_all_datafit()` function, and loaded into the environment with the `load_all_datafit()` function.
