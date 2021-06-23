@@ -19,4 +19,8 @@ Imports:
     here,
     tidybayes,
     rstan,
-    rstanarm
+    rstanarm,
+    cmdstanr,
+    posterior,
+    ggpubr
+Additional_repositories: https://mc-stan.org/r-packages/
