@@ -143,7 +143,7 @@ plot_od_sens_curve <- function(height, width) {
   datafit_od_curve <- get_datafit_control()
   ggplot(data = datafit_od_curve, aes(y = od)) +
     geom_point(aes(x = Value, color = Type), shape = 4) +
-    labs(y = expression("OD"[450]), x = "%", fill = "") +
+    labs(y = expression("A"[450]), x = "%", fill = "") +
     scale_fill_identity(guide = "legend", labels = c("Specificity", "Sensitivity")) +
     theme_bw() + theme(aspect.ratio = 0.7) + theme(legend.position = "bottom") +
     facet_grid(cols = vars(protein)) +
