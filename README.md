@@ -44,7 +44,7 @@ The mcmc samples are in the `/data` folder:
 * `/data/fit_mcmc_sens.RData` are the raw mcmc samples from the cmdstanr model for the heterogenous sensitivity model shown in Figure 3.
 * `/data/fit_mcmc_spec.RData` are the raw mcmc samples from the cmdstanr model for the heterogenous specificity model shown in Figure S11.
 
-The stan code and the raw mcmc outputs is contained in the `outputs/` folder.
+The stan code and the raw mcmc outputs is contained in the `include/` folder.
 
 The figures used in the final article are in the `outputs/figs/` folder.
 

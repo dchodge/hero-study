@@ -305,11 +305,11 @@ get_linear_rel_ui <- function() {
   m1_s <- lm(y_s ~ x)
   m2_s <- lm(log2(y_s) ~ log2(x))
   summary(m1_s) # 0.9941
-  summary(m2_s) # 0.9974, better
+  summary(m2_s) # 0.9974, better, 0.092 + 1.0008*x
   m1_n <- lm(y_n ~ x)
   m2_n <- lm(log2(y_n) ~ log2(x))
   summary(m1_n) # 0.9968
-  summary(m2_n) # 0.9984, better
+  summary(m2_n) # 0.9984, better  0.6501 + 0.9348*x
   p1 <- ggplot(data = data.frame(x = x, y = y_S)) +
     geom_point(aes(x = x, y = y), shape = 3, size = 4) +
     geom_abline(intercept = as.numeric(m1_S$coefficients[1]),
