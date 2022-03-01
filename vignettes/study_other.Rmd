@@ -214,3 +214,79 @@ get_mean_ci(post1$marginal_s)
 
 ```
 
+```{r}
+
+inter_start <- c("marginal_a_i", "marginal_e_i", "marginal_g_i", "marginal_s_i")
+slope_change <- c("marginal_a_s", "marginal_e_s", "marginal_g_s", "marginal_s_s")
+
+start <- init_model_ab_kin(name = "start",
+                           stan_file = "start",
+                           datafit = datafit_start,
+                           marginal_vars = inter_start,
+                           y_axis = "log(AU) at first bleed")
+change <- init_model_ab_kin(name = "change",
+                            stan_file = "change",
+                            datafit = datafit_change,
+                            marginal_vars = slope_change,
+                            y_axis = "Change in log(AU) after 28 days")
+
+start_sample <- clean_samples(start)
+change_sample <- clean_samples(change)
+
+all_start_S <- 1:4 %>% map(~rnorm(1000, start_sample[.x, ]$`50%`, (start_sample[.x, ]$`50%` - start_sample[.x, ]$`2.5%`) / 2) ) %>% unlist
+get_mean_ci(all_start_S)
+
+all_start_N <- 14:18 %>% map(~rnorm(1000, start_sample[.x, ]$`50%`, (start_sample[.x, ]$`50%` - start_sample[.x, ]$`2.5%`) / 2) ) %>% unlist
+get_mean_ci(all_start_N)
+
+all_change_S <- 1:4 %>% map(~rnorm(1000, change_sample[.x, ]$`50%`, (change_sample[.x, ]$`50%` - change_sample[.x, ]$`2.5%`) / 2) ) %>% unlist
+get_mean_ci(all_change_S)
+
+all_change_N <- 14:18 %>% map(~rnorm(1000, change_sample[.x, ]$`50%`, (change_sample[.x, ]$`50%` - change_sample[.x, ]$`2.5%`) / 2) ) %>% unlist
+get_mean_ci(all_change_N)
+
+bind_rows(
+  get_mean_ci(all_start_S),
+  get_mean_ci(all_start_N),
+  get_mean_ci(all_change_S),
+  get_mean_ci(all_change_N)
+)
+
+data(fit_mcmc_start)
+
+x <- str2lang(paste0(start$marginal[1], "[j]"))
+sd <- medianvalues$sigma %>% unique %>% `*`(10)
+full <- m2_start[[2]] %>%
+        as_draws_df %>%
+        tidybayes::spread_draws(sigma, !!x)
+medianvalues <- m2_start[[2]] %>%
+        as_draws_df %>%
+        tidybayes::spread_draws(sigma, !!x) %>%
+        ggdist::median_qi() %>%
+        as.data.frame
+
+fullsamples <- list()
+for (i in 1:5) {
+  age <- full %>% filter(j == i) %>% pull(marginal_a_i)
+  agefull <- 1:4000 %>% map(~rnorm(1, age[.x], sd)) %>% unlist
+
+  fullsamples[[i]] <- data.frame(
+    age = i,
+    titre_start = agefull
+  )
+}
+
+fullsamples %>% bind_rows %>% group_by(age) %>%
+  dplyr::summarise(mean = mean(titre_start), sd = sd(titre_start))
+        
+
+
+
+
+medianvalues %>% 
+
+
+```
+
+
+
